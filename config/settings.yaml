@@ -2,13 +2,19 @@ rag:
   chunk_size: 1000
   chunk_overlap: 150
   retrieval_k: 4
-  embeddings_model: "text-embedding-3-small"      # OpenAI (preferido)
-  embeddings_fallback: "all-MiniLM-L6-v2"         # HuggingFace (sin key)
+
+  # --- Embeddings (prioridad 1): OpenAI si OPENAI_API_KEY está configurada ---
+  embeddings_model: "text-embedding-3-small"
+
+  # --- Embeddings (prioridad 2): Ollama local, sin API key ---
+  # Para escalar a mejor calidad: cambiar a qwen3-embedding:4b y reindexar
+  embeddings_ollama_model: "qwen3-embedding:0.6b"
 
 llm:
   temperature: 0.2
 
 index:
-  auto_index_on_startup: true   # indexa automáticamente si hay PDFs nuevos
+  auto_index_on_startup: true
   persist_dir: "chroma_db"
   content_base: "content/asignaturas"
+  ollama_url: "http://localhost:11434"

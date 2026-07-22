@@ -9,10 +9,8 @@ from typing import Any, Iterable
 
 import yaml
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_core.retrievers import BaseRetriever
-from langchain_openai import OpenAIEmbeddings
 
 try:
     from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -43,21 +41,38 @@ def _collection_name(asignatura: str) -> str:
 
 
 def _get_embeddings(openai_api_key: str | None = None) -> Any:
-    """Embeddings con OpenAI y fallback a HuggingFace."""
-    api_key = openai_api_key or os.getenv("OPENAI_API_KEY")
+    """
+    Estrategia de embeddings (en orden de prioridad):
+    1. OpenAI text-embedding-3-small  → si hay OPENAI_API_KEY disponible
+    2. Ollama qwen3-embedding:0.6b    → modelo local, sin API key (default)
+    Para cambiar a 4b: editar embeddings_ollama_model en config/settings.yaml
+    """
     settings = _load_settings()
+    api_key = openai_api_key or os.getenv("OPENAI_API_KEY")
+
+    # --- Opción 1: OpenAI (si hay key) ---
     if api_key:
+        from langchain_openai import OpenAIEmbeddings
         return OpenAIEmbeddings(
-            model=settings["rag"]["embeddings_model"], api_key=api_key
+            model=settings["rag"]["embeddings_model"],
+            api_key=api_key,
         )
+
+    # --- Opción 2: Ollama local (qwen3-embedding:0.6b por defecto) ---
     try:
-        return HuggingFaceEmbeddings(
-            model_name=settings["rag"]["embeddings_fallback"]
+        from langchain_ollama import OllamaEmbeddings
+        ollama_url = os.getenv(
+            "OLLAMA_URL",
+            settings["index"].get("ollama_url", "http://localhost:11434"),
         )
-    except ImportError as exc:
+        model = settings["rag"]["embeddings_ollama_model"]
+        return OllamaEmbeddings(model=model, base_url=ollama_url)
+    except Exception as exc:
         raise RuntimeError(
-            "No fue posible inicializar embeddings locales. "
-            "Instala sentence-transformers o configura OPENAI_API_KEY."
+            "No fue posible conectar con Ollama para los embeddings.\n"
+            "Asegúrate de que Ollama esté activo y ejecuta:\n"
+            f"  ollama pull {settings['rag']['embeddings_ollama_model']}\n"
+            "O configura OPENAI_API_KEY como alternativa."
         ) from exc
 
 
@@ -77,7 +92,7 @@ def _drop_collection(asignatura: str) -> None:
 
 
 # ------------------------------------------------------------------ #
-#  PRINCIPAL: indexación desde directorio local (documentación curada) #
+#  PRINCIPAL: indexación desde directorio local                       #
 # ------------------------------------------------------------------ #
 
 def ingest_from_directory(
@@ -87,9 +102,8 @@ def ingest_from_directory(
 ) -> int:
     """
     Lee todos los PDFs desde config/asignaturas.yaml[asignatura][pdf_dir]
-    y los indexa en ChromaDB.
-    - force_reindex=True: borra la colección y reconstruye desde cero.
-    - Retorna el número de chunks indexados.
+    y los indexa en ChromaDB usando qwen3-embedding:0.6b (o OpenAI si hay key).
+    Retorna el número de chunks indexados.
     """
     asig_cfg = _load_asig_config()
     if asignatura not in asig_cfg:
@@ -128,7 +142,7 @@ def ingest_from_directory(
 
 
 # ------------------------------------------------------------------ #
-#  LEGACY: ingesta dinámica por file_obj (mantiene compatibilidad)    #
+#  LEGACY: ingesta dinámica por file_obj                              #
 # ------------------------------------------------------------------ #
 
 def ingest_documents(
@@ -136,7 +150,7 @@ def ingest_documents(
     asignatura: str,
     openai_api_key: str | None = None,
 ) -> int:
-    """Ingresa PDFs recibidos como file objects (compatibilidad con uploads)."""
+    """Ingesta por file objects — mantiene compatibilidad."""
     settings = _load_settings()
     documentos = []
     for file_obj in pdf_files:
@@ -178,7 +192,7 @@ def get_retriever(
     k: int | None = None,
     openai_api_key: str | None = None,
 ) -> BaseRetriever:
-    """Retorna el retriever para la asignatura; falla claro si no hay documentos."""
+    """Retorna el retriever; error claro si no hay documentos indexados."""
     settings = _load_settings()
     k = k or settings["rag"]["retrieval_k"]
     vs = _get_vector_store(asignatura=asignatura, openai_api_key=openai_api_key)
