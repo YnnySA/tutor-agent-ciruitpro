@@ -1,0 +1,31 @@
+/* Coolors Exported Palette - https://coolors.co/95f651-baf3d7-cbeff6-cbf4e8-ecfdef */
+
+- CSV
+
+95f651,baf3d7,cbeff6,cbf4e8,ecfdef
+
+- With #
+
+#95f651, #baf3d7, #cbeff6, #cbf4e8, #ecfdef
+
+- Array
+
+["95f651","baf3d7","cbeff6","cbf4e8","ecfdef"]
+
+- Object
+
+{"Lawn Green":"95f651","Celadon":"baf3d7","Light Cyan":"cbeff6","Frozen Water":"cbf4e8","Honeydew":"ecfdef"}
+
+- Extended Array
+
+[{"name":"Lawn Green","hex":"95f651","rgb":[149,246,81],"cmyk":[39,0,67,4],"hsb":[95,67,96],"hsl":[95,90,64],"lab":[88,-55,67]},{"name":"Celadon","hex":"baf3d7","rgb":[186,243,215],"cmyk":[23,0,12,5],"hsb":[151,23,95],"hsl":[151,70,84],"lab":[91,-24,8]},{"name":"Light Cyan","hex":"cbeff6","rgb":[203,239,246],"cmyk":[17,3,0,4],"hsb":[190,17,96],"hsl":[190,70,88],"lab":[92,-10,-7]},{"name":"Frozen Water","hex":"cbf4e8","rgb":[203,244,232],"cmyk":[17,0,5,4],"hsb":[162,17,96],"hsl":[162,65,88],"lab":[93,-15,1]},{"name":"Honeydew","hex":"ecfdef","rgb":[236,253,239],"cmyk":[7,0,6,1],"hsb":[131,7,99],"hsl":[131,81,96],"lab":[98,-8,5]}]
+
+- XML
+
+<palette>
+  <color name="Lawn Green" hex="95f651" r="149" g="246" b="81" />
+  <color name="Celadon" hex="baf3d7" r="186" g="243" b="215" />
+  <color name="Light Cyan" hex="cbeff6" r="203" g="239" b="246" />
+  <color name="Frozen Water" hex="cbf4e8" r="203" g="244" b="232" />
+  <color name="Honeydew" hex="ecfdef" r="236" g="253" b="239" />
+</palette>
