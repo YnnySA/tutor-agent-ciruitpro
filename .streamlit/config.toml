@@ -1,0 +1,7 @@
+[theme]
+# Paleta: Lawn Green / Celadon / Light Cyan / Frozen Water / Honeydew
+font                     = "monospace"
+primaryColor             = "#95f651"
+backgroundColor          = "#ecfdef"
+secondaryBackgroundColor = "#cbf4e8"
+textColor                = "#1a2e20"
