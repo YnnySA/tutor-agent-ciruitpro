@@ -8,14 +8,12 @@ from pathlib import Path
 from typing import Any, Iterable
 
 from langchain_community.document_loaders import PyPDFLoader
-from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain_core.retrievers import BaseRetriever
-from langchain_openai import OpenAIEmbeddings
 
 try:
     from langchain.text_splitter import RecursiveCharacterTextSplitter
-except ModuleNotFoundError:  # pragma: no cover - compatibilidad LangChain 1.x
+except ModuleNotFoundError:
     from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 CHROMA_DIR = Path(__file__).resolve().parent.parent / "chroma_db"
@@ -25,9 +23,12 @@ ASIGNATURA_COLLECTION = {
     "maquinas_electricas": "maquinas",
 }
 
+# Modelo Ollama por defecto — cambiar a qwen3-embedding:4b para mayor calidad
+OLLAMA_EMBEDDING_MODEL = os.getenv("OLLAMA_EMBEDDING_MODEL", "qwen3-embedding:0.6b")
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+
 
 def _collection_name(asignatura: str) -> str:
-    """Mapea el identificador de asignatura al nombre de colección de Chroma."""
     if asignatura not in ASIGNATURA_COLLECTION:
         disponibles = ", ".join(ASIGNATURA_COLLECTION.keys())
         raise ValueError(f"Asignatura inválida: {asignatura}. Opciones: {disponibles}")
@@ -35,21 +36,33 @@ def _collection_name(asignatura: str) -> str:
 
 
 def _get_embeddings(openai_api_key: str | None = None) -> Any:
-    """Inicializa embeddings con OpenAI y fallback a HuggingFace."""
+    """
+    Estrategia de embeddings (en orden de prioridad):
+    1. OpenAI text-embedding-3-small  → si hay OPENAI_API_KEY
+    2. Ollama qwen3-embedding:0.6b    → modelo local, sin API key (default)
+    Para escalar: cambiar OLLAMA_EMBEDDING_MODEL=qwen3-embedding:4b y reindexar.
+    """
     api_key = openai_api_key or os.getenv("OPENAI_API_KEY")
+
+    # --- Opción 1: OpenAI ---
     if api_key:
+        from langchain_openai import OpenAIEmbeddings
         return OpenAIEmbeddings(model="text-embedding-3-small", api_key=api_key)
+
+    # --- Opción 2: Ollama local (qwen3-embedding:0.6b) ---
     try:
-        return HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-    except ImportError as exc:
+        from langchain_ollama import OllamaEmbeddings
+        return OllamaEmbeddings(model=OLLAMA_EMBEDDING_MODEL, base_url=OLLAMA_URL)
+    except Exception as exc:
         raise RuntimeError(
-            "No fue posible inicializar embeddings locales. "
-            "Instala sentence-transformers o configura OPENAI_API_KEY."
+            "No fue posible conectar con Ollama para los embeddings.\n"
+            "Asegúrate de que Ollama esté activo y ejecuta:\n"
+            f"  ollama pull {OLLAMA_EMBEDDING_MODEL}\n"
+            "O configura OPENAI_API_KEY como alternativa."
         ) from exc
 
 
 def _get_vector_store(asignatura: str, openai_api_key: str | None = None) -> Chroma:
-    """Construye la instancia de vector store para una asignatura."""
     CHROMA_DIR.mkdir(parents=True, exist_ok=True)
     return Chroma(
         collection_name=_collection_name(asignatura),
@@ -72,16 +85,13 @@ def ingest_documents(
         payload = file_obj.read()
         if not payload:
             continue
-
         temp_path = ""
         try:
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
                 tmp.write(payload)
                 temp_path = tmp.name
-
             loader = PyPDFLoader(temp_path)
-            loaded_docs = loader.load()
-            for doc in loaded_docs:
+            for doc in loader.load():
                 doc.metadata["source"] = file_name
                 documentos.append(doc)
         finally:
@@ -107,7 +117,7 @@ def get_retriever(
     k: int = 4,
     openai_api_key: str | None = None,
 ) -> BaseRetriever:
-    """Retorna el retriever para la asignatura; falla si no hay documentos."""
+    """Retorna el retriever; error claro si no hay documentos indexados."""
     vector_store = _get_vector_store(asignatura=asignatura, openai_api_key=openai_api_key)
     if vector_store._collection.count() == 0:
         raise ValueError(
@@ -122,8 +132,8 @@ def list_indexed_documents(asignatura: str, openai_api_key: str | None = None) -
     vector_store = _get_vector_store(asignatura=asignatura, openai_api_key=openai_api_key)
     metadatas = vector_store.get(include=["metadatas"]).get("metadatas") or []
     fuentes = {
-        (metadata or {}).get("source", "")
-        for metadata in metadatas
-        if (metadata or {}).get("source")
+        (m or {}).get("source", "")
+        for m in metadatas
+        if (m or {}).get("source")
     }
     return sorted(fuentes)
