@@ -1,97 +1,29 @@
-<![CDATA[<meta charset="UTF-8">
-
-<style>
-  body, h1, h2, h3, h4, p, li, td, th, code, pre, span, div {
-    font-family: "Consolas", "Courier New", monospace !important;
-  }
-
-  h1 { color: #4a7c20; border-bottom: 3px solid #95f651; padding-bottom: 8px; }
-  h2 { color: #2e6b50; border-left: 5px solid #95f651; padding-left: 12px; margin-top: 32px; }
-  h3 { color: #1a5c45; border-left: 3px solid #baf3d7; padding-left: 10px; }
-  h4 { color: #2e6b50; }
-
-  code {
-    background-color: #cbf4e8;
-    color: #1a3d2b;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: "Consolas", monospace !important;
-  }
-
-  pre {
-    background-color: #cbeff6;
-    border-left: 4px solid #95f651;
-    border-radius: 6px;
-    padding: 16px;
-    overflow-x: auto;
-  }
-
-  pre code {
-    background-color: transparent;
-    padding: 0;
-    color: #1a2e20;
-  }
-
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 16px 0;
-  }
-
-  th {
-    background-color: #95f651;
-    color: #1a2e20;
-    padding: 10px 14px;
-    text-align: left;
-  }
-
-  td {
-    background-color: #ecfdef;
-    padding: 8px 14px;
-    border-bottom: 1px solid #baf3d7;
-  }
-
-  tr:nth-child(even) td { background-color: #cbf4e8; }
-
-  blockquote {
-    background-color: #ecfdef;
-    border-left: 5px solid #baf3d7;
-    padding: 12px 16px;
-    margin: 16px 0;
-    border-radius: 0 6px 6px 0;
-    color: #2e6b50;
-  }
-
-  .badge-critico    { background:#95f651; color:#1a2e20; padding:2px 8px; border-radius:12px; font-weight:bold; }
-  .badge-alto       { background:#baf3d7; color:#1a3d2b; padding:2px 8px; border-radius:12px; font-weight:bold; }
-  .badge-medio      { background:#cbeff6; color:#1a3d2b; padding:2px 8px; border-radius:12px; font-weight:bold; }
-  .badge-bajo       { background:#ecfdef; color:#1a3d2b; padding:2px 8px; border-radius:12px; font-weight:bold; }
-</style>
-
----
-
 # ⚡ PLAN INTEGRAL DE DESARROLLO
 # Tutor RAG · Ingeniería Eléctrica
 ### Repositorio: `YnnySA/tutor-agent-ciruitpro`
+
+> **Paleta de colores del proyecto:**
+> `#95f651` Lawn Green · `#baf3d7` Celadon · `#cbeff6` Light Cyan · `#cbf4e8` Frozen Water · `#ecfdef` Honeydew
+> **Fuente:** Consolas (monoespaciada) — aplicada en la app Streamlit y en previsualizaciones HTML.
 
 ---
 
 ## 📋 Índice
 
-1. [Estado Real del Proyecto](#estado-real)
-2. [Arquitectura Objetivo](#arquitectura-objetivo)
-3. [Fase 1 — Correcciones Críticas de Infraestructura](#fase-1)
-4. [Fase 2 — Capa de Configuración Externa](#fase-2)
-5. [Fase 3 — Refactorizar Backend](#fase-3)
-6. [Fase 4 — Refactorizar Frontend](#fase-4)
-7. [Fase 5 — CLI de Indexación](#fase-5)
-8. [Fase 6 — Limpieza y Tests](#fase-6)
-9. [Flujo Operativo con PDF del Cliente](#flujo-operativo)
-10. [Resumen Ejecutivo](#resumen)
+1. [Estado Real del Proyecto](#1-estado-real-del-proyecto)
+2. [Arquitectura Objetivo](#2-arquitectura-objetivo)
+3. [Fase 1 — Correcciones Críticas de Infraestructura](#3-fase-1--correcciones-críticas-de-infraestructura)
+4. [Fase 2 — Capa de Configuración Externa](#4-fase-2--capa-de-configuración-externa)
+5. [Fase 3 — Refactorizar Backend](#5-fase-3--refactorizar-backend)
+6. [Fase 4 — Refactorizar Frontend](#6-fase-4--refactorizar-frontend)
+7. [Fase 5 — CLI de Indexación](#7-fase-5--cli-de-indexación)
+8. [Fase 6 — Limpieza y Tests](#8-fase-6--limpieza-y-tests)
+9. [Flujo Operativo con PDF del Cliente](#9-flujo-operativo-con-pdf-del-cliente)
+10. [Resumen Ejecutivo](#10-resumen-ejecutivo)
 
 ---
 
-## 1. Estado Real del Proyecto {#estado-real}
+## 1. Estado Real del Proyecto
 
 > Inventario completo de archivos actuales con su nivel de deuda técnica.
 
@@ -109,7 +41,7 @@
 
 ---
 
-## 2. Arquitectura Objetivo {#arquitectura-objetivo}
+## 2. Arquitectura Objetivo
 
 > **Principio rector:** Todo lo que cambia por configuración → `config/` · Todo lo visual → `frontend/` · Toda la lógica → `backend/`
 
@@ -118,7 +50,7 @@ tutor-agent-ciruitpro/               ← RAÍZ LIMPIA
 │
 ├── Chatbot.py                        ← Entry point (~30 líneas, solo UI)
 │
-├── 📁 frontend/                      ← Todo Streamlit, sin lógica de negocio
+├── frontend/                         ← Todo Streamlit, sin lógica de negocio
 │   ├── __init__.py
 │   ├── state.py                      ← st.session_state centralizado
 │   ├── sidebar.py                    ← Componente sidebar reutilizable
@@ -126,31 +58,31 @@ tutor-agent-ciruitpro/               ← RAÍZ LIMPIA
 │       ├── chat.py                   ← Render del chat + historial
 │       └── source_badge.py          ← Muestra fuentes RAG al estudiante
 │
-├── 📁 backend/                       ← Lógica pura, CERO imports de streamlit
+├── backend/                          ← Lógica pura, CERO imports de streamlit
 │   ├── __init__.py
 │   ├── llm_factory.py                ← Fábrica multi-proveedor (lee config/)
 │   ├── rag_pipeline.py               ← Chain RAG conversacional (lee config/)
 │   ├── vector_store.py               ← ChromaDB: ingest_from_directory + retrieval
 │   └── indexer.py                    ← NUEVO: orquesta indexación desde directorios
 │
-├── 📁 config/                        ← TODO lo editable sin tocar código Python
+├── config/                           ← TODO lo editable sin tocar código Python
 │   ├── asignaturas.yaml              ← Asignaturas, temarios, rutas de PDFs
 │   ├── providers.yaml                ← Proveedores LLM y modelos disponibles
 │   └── settings.yaml                 ← chunk_size, k, temperatura, paths
 │
-├── 📁 pages/                         ← Solo admin, no visible para estudiantes
+├── pages/                            ← Solo admin, no visible para estudiantes
 │   └── 2_Configuracion.py           ← API keys (refactorizado)
 │
-├── 📁 content/
+├── content/
 │   └── asignaturas/
 │       ├── circuitos/                ← PDFs del cliente van aquí
 │       ├── electronica/
 │       └── maquinas_electricas/
 │
-├── 📁 scripts/
+├── scripts/
 │   └── index_docs.py                 ← CLI: ejecutar una vez por semestre
 │
-├── 📁 tests/
+├── tests/
 │   ├── test_llm_factory.py
 │   ├── test_vector_store.py
 │   └── test_rag_pipeline.py
@@ -167,9 +99,9 @@ tutor-agent-ciruitpro/               ← RAÍZ LIMPIA
 
 ---
 
-## 3. FASE 1 — Correcciones Críticas de Infraestructura {#fase-1}
+## 3. FASE 1 — Correcciones Críticas de Infraestructura
 
-> <span class="badge-critico">🔴 PRIORIDAD CRÍTICA</span> · Duración estimada: **20 minutos**
+> 🔴 **PRIORIDAD CRÍTICA** · Duración estimada: **20 minutos**
 > Sin esta fase, el resto no funciona correctamente en Streamlit Cloud.
 
 ### 1.1 Desanidar el proyecto
@@ -230,9 +162,9 @@ git push
 
 ---
 
-## 4. FASE 2 — Capa de Configuración Externa {#fase-2}
+## 4. FASE 2 — Capa de Configuración Externa
 
-> <span class="badge-critico">🔴 PRIORIDAD CRÍTICA</span> · Duración estimada: **15 minutos**
+> 🔴 **PRIORIDAD CRÍTICA** · Duración estimada: **15 minutos**
 > Debe completarse antes de modificar cualquier archivo Python.
 
 ### 4.1 `config/asignaturas.yaml`
@@ -302,23 +234,23 @@ rag:
   chunk_size: 1000
   chunk_overlap: 150
   retrieval_k: 4
-  embeddings_model: "text-embedding-3-small"        # OpenAI (preferido)
-  embeddings_fallback: "all-MiniLM-L6-v2"           # HuggingFace (sin key)
+  embeddings_model: "text-embedding-3-small"      # OpenAI (preferido)
+  embeddings_fallback: "all-MiniLM-L6-v2"         # HuggingFace (sin key)
 
 llm:
   temperature: 0.2
 
 index:
-  auto_index_on_startup: true    # indexa automáticamente si hay PDFs nuevos
+  auto_index_on_startup: true   # indexa automáticamente si hay PDFs nuevos
   persist_dir: "chroma_db"
   content_base: "content/asignaturas"
 ```
 
 ---
 
-## 5. FASE 3 — Refactorizar Backend {#fase-3}
+## 5. FASE 3 — Refactorizar Backend
 
-> <span class="badge-alto">🟠 PRIORIDAD ALTA</span> · Duración estimada: **30 minutos**
+> 🟠 **PRIORIDAD ALTA** · Duración estimada: **30 minutos**
 
 ### 5.1 Renombrar `core/` → `backend/`
 
@@ -443,9 +375,9 @@ def get_provider_models() -> dict[str, list[str]]:
 
 ---
 
-## 6. FASE 4 — Refactorizar Frontend {#fase-4}
+## 6. FASE 4 — Refactorizar Frontend
 
-> <span class="badge-medio">🟡 PRIORIDAD MEDIA</span> · Duración estimada: **25 minutos**
+> 🟡 **PRIORIDAD MEDIA** · Duración estimada: **25 minutos**
 
 ### 6.1 `frontend/state.py`
 
@@ -501,9 +433,9 @@ git commit -m "feat: eliminar página de carga de docs (indexación vía CLI)"
 
 ---
 
-## 7. FASE 5 — CLI de Indexación {#fase-5}
+## 7. FASE 5 — CLI de Indexación
 
-> <span class="badge-alto">🟠 PRIORIDAD ALTA</span> · Duración estimada: **10 minutos**
+> 🟠 **PRIORIDAD ALTA** · Duración estimada: **10 minutos**
 > Este script debe estar listo **antes** de recibir el PDF del cliente.
 
 ### `scripts/index_docs.py`
@@ -527,9 +459,9 @@ from backend.indexer import index_all, index_asignatura, chroma_status
 parser = argparse.ArgumentParser(
     description="Indexador de documentos para Tutor RAG · Ingeniería Eléctrica"
 )
-parser.add_argument("--asignatura", help="ID de la asignatura (circuitos | electronica | maquinas_electricas)")
+parser.add_argument("--asignatura", help="ID: circuitos | electronica | maquinas_electricas")
 parser.add_argument("--all",    action="store_true", help="Indexar todas las asignaturas")
-parser.add_argument("--force",  action="store_true", help="Reindexar desde cero (borra colección existente)")
+parser.add_argument("--force",  action="store_true", help="Reindexar desde cero")
 parser.add_argument("--status", action="store_true", help="Ver estado actual de ChromaDB")
 args = parser.parse_args()
 
@@ -556,9 +488,9 @@ else:
 
 ---
 
-## 8. FASE 6 — Limpieza y Tests {#fase-6}
+## 8. FASE 6 — Limpieza y Tests
 
-> <span class="badge-bajo">🔵 PRIORIDAD BAJA</span> · Duración estimada: **30 minutos**
+> 🔵 **PRIORIDAD BAJA** · Duración estimada: **30 minutos**
 > Completar después de validar funcionamiento end-to-end.
 
 ### Tests mínimos requeridos
@@ -584,7 +516,7 @@ def test_temario_desde_config():
 
 ---
 
-## 9. Flujo Operativo cuando llegue el PDF {#flujo-operativo}
+## 9. Flujo Operativo con PDF del Cliente
 
 ```
 CLIENTE ENTREGA PDF
@@ -613,9 +545,9 @@ CLIENTE ENTREGA PDF
       ▼
 6. ESTUDIANTES YA PUEDEN CONSULTAR ✅
 
-─────────────────────────────────────
+─────────────────────────────────────────
 CUANDO EL CLIENTE ACTUALICE EL PDF:
-─────────────────────────────────────
+─────────────────────────────────────────
 cp ~/Downloads/circuitos_v2.pdf content/asignaturas/circuitos/
 python scripts/index_docs.py --asignatura circuitos --force
 ✅  circuitos: 1024 chunks indexados (reindexado desde cero)
@@ -623,13 +555,13 @@ python scripts/index_docs.py --asignatura circuitos --force
 
 ---
 
-## 10. Resumen Ejecutivo {#resumen}
+## 10. Resumen Ejecutivo
 
 | Fase | Tarea Principal | Tiempo | Prioridad |
 |---|---|---|---|
 | **1** | Desanidar repo + actualizar `requirements.txt` | 20 min | 🔴 Inmediata |
 | **2** | Crear `config/asignaturas.yaml`, `providers.yaml`, `settings.yaml` | 15 min | 🔴 Antes de código |
-| **3** | `core/` → `backend/` + agregar `indexer.py` + leer desde config | 30 min | 🟠 Esta semana |
+| **3** | `core/` → `backend/` + `indexer.py` + leer desde config | 30 min | 🟠 Esta semana |
 | **4** | Crear `frontend/` + limpiar `Chatbot.py` + eliminar página upload | 25 min | 🟡 Esta semana |
 | **5** | `scripts/index_docs.py` CLI | 10 min | 🟠 Antes del PDF |
 | **6** | Tests en `tests/` | 30 min | 🔵 Post-funcional |
@@ -638,19 +570,28 @@ python scripts/index_docs.py --asignatura circuitos --force
 
 ---
 
-### Paleta de Colores del Proyecto
+## Paleta de Colores del Proyecto
 
-| Nombre | HEX | Uso |
-|---|---|---|
-| Lawn Green | `#95f651` | Acentos primarios, bordes activos, badges críticos |
-| Celadon | `#baf3d7` | Bordes secundarios, highlights |
-| Light Cyan | `#cbeff6` | Fondos de código (`pre`) |
-| Frozen Water | `#cbf4e8` | Fondos de código inline (`code`), filas pares de tabla |
-| Honeydew | `#ecfdef` | Fondo general de celdas, blockquotes |
+| Nombre | HEX | RGB | Uso en la app |
+|---|---|---|---|
+| Lawn Green | `#95f651` | 149, 246, 81 | Acentos primarios, bordes activos, badges críticos |
+| Celadon | `#baf3d7` | 186, 243, 215 | Bordes secundarios, highlights |
+| Light Cyan | `#cbeff6` | 203, 239, 246 | Fondos de bloques de código (`pre`) |
+| Frozen Water | `#cbf4e8` | 203, 244, 232 | Código inline (`code`), filas pares de tabla |
+| Honeydew | `#ecfdef` | 236, 253, 239 | Fondo general de celdas, blockquotes |
 
-> Fuente del proyecto: **Consolas** (monoespaciada) para todo el documento y la aplicación.
+> **Fuente del proyecto:** Consolas (monoespaciada) — aplicar en `.streamlit/config.toml` y en cualquier hoja de estilos de la app.
+
+```toml
+# .streamlit/config.toml
+[theme]
+font = "monospace"
+primaryColor = "#95f651"
+backgroundColor = "#ecfdef"
+secondaryBackgroundColor = "#cbf4e8"
+textColor = "#1a2e20"
+```
 
 ---
 
 *Generado: 2026-07-22 · Repositorio: [YnnySA/tutor-agent-ciruitpro](https://github.com/YnnySA/tutor-agent-ciruitpro)*
-]]>
