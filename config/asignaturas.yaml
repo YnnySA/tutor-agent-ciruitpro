@@ -1,0 +1,29 @@
+# Editar aquí para agregar/modificar asignaturas SIN tocar código Python
+asignaturas:
+  circuitos:
+    nombre_display: "Circuitos Eléctricos"
+    collection_id: "circuitos"
+    pdf_dir: "content/asignaturas/circuitos"
+    temario: >
+      Leyes de Kirchhoff, análisis nodal y de mallas,
+      teoremas de Thevenin y Norton, respuesta transitoria RC/RL/RLC,
+      potencia en AC, factor de potencia y corrección.
+
+  electronica:
+    nombre_display: "Electrónica"
+    collection_id: "electronica"
+    pdf_dir: "content/asignaturas/electronica"
+    temario: >
+      Diodos rectificadores y Zener, transistores BJT y MOSFET,
+      amplificadores operacionales, polarización DC,
+      modelos de pequeña señal, electrónica digital básica.
+
+  maquinas_electricas:
+    nombre_display: "Máquinas Eléctricas"
+    collection_id: "maquinas"
+    pdf_dir: "content/asignaturas/maquinas_electricas"
+    temario: >
+      Transformadores monofásicos y trifásicos, máquinas DC
+      (motores y generadores), máquinas síncronas y asíncronas,
+      circuitos equivalentes, ensayos normalizados IEC,
+      regulación de tensión y rendimiento.

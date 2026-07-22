@@ -1,0 +1,14 @@
+rag:
+  chunk_size: 1000
+  chunk_overlap: 150
+  retrieval_k: 4
+  embeddings_model: "text-embedding-3-small"      # OpenAI (preferido)
+  embeddings_fallback: "all-MiniLM-L6-v2"         # HuggingFace (sin key)
+
+llm:
+  temperature: 0.2
+
+index:
+  auto_index_on_startup: true   # indexa automáticamente si hay PDFs nuevos
+  persist_dir: "chroma_db"
+  content_base: "content/asignaturas"

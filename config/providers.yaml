@@ -1,0 +1,21 @@
+# Agregar nuevos modelos aquí sin modificar backend/llm_factory.py
+providers:
+  OpenAI:
+    modelos: ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"]
+    requiere_key: true
+    key_env: "OPENAI_API_KEY"
+
+  Anthropic:
+    modelos: ["claude-3-5-sonnet-20241022", "claude-3-haiku-20240307"]
+    requiere_key: true
+    key_env: "ANTHROPIC_API_KEY"
+
+  Google:
+    modelos: ["gemini-2.0-flash", "gemini-1.5-pro"]
+    requiere_key: true
+    key_env: "GOOGLE_API_KEY"
+
+  Ollama:
+    modelos: ["qwen3.5:4b", "llama3.1:8b", "mistral:7b", "phi3:mini"]
+    requiere_key: false
+    default_url: "http://localhost:11434"
