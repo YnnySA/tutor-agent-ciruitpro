@@ -4,7 +4,7 @@ from __future__ import annotations
 
 TRANSLATIONS: dict[str, dict[str, str]] = {
     "es": {
-        # --- Página principal ---
+        # --- Página principal (Chatbot) ---
         "page_title": "Tutor RAG de Ingeniería Eléctrica",
         "app_title": "Tutor RAG de Ingeniería Eléctrica",
         "app_caption": "Responde con base en el contenido indexado por asignatura",
@@ -34,9 +34,34 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         # --- Fuentes ---
         "sources_label": "Fuentes",
         "sources_unavailable": "No disponibles.",
+        # --- Página Upload Content ---
+        "upload_page_title": "Cargar contenido para el tutor",
+        "upload_page_caption": "Sube PDFs y asócialos a una asignatura para indexarlos en ChromaDB",
+        "label_target_course": "Asignatura destino",
+        "label_select_pdfs": "Selecciona uno o varios PDFs",
+        "btn_index": "Indexar en ChromaDB",
+        "warn_no_files": "Primero debes cargar al menos un archivo PDF.",
+        "status_indexing": "Indexando documentos...",
+        "status_processing": "Procesando:",
+        "status_done": "Indexación completada",
+        "success_indexed": "Se indexaron {chunks} chunks en la asignatura '{course}'.",
+        "subheader_indexed_docs": "Documentos indexados",
+        "info_no_docs": "Aún no hay documentos indexados para esta asignatura.",
+        # --- Página Settings ---
+        "settings_page_title": "Configuración del tutor",
+        "settings_page_caption": "Guarda tus credenciales de proveedores y la URL de Ollama",
+        "label_openai_key": "API key de OpenAI",
+        "label_anthropic_key": "API key de Anthropic",
+        "label_google_key": "API key de Google",
+        "btn_save_settings": "Guardar configuración",
+        "success_settings_saved": "Configuración guardada en la sesión actual.",
+        "info_secrets_hint": (
+            "Para persistir claves fuera de la sesión, usa `.streamlit/secrets.toml` "
+            "a partir del template `secrets.toml.example`."
+        ),
     },
     "en": {
-        # --- Main page ---
+        # --- Main page (Chatbot) ---
         "page_title": "Electrical Engineering RAG Tutor",
         "app_title": "Electrical Engineering RAG Tutor",
         "app_caption": "Answers based on course-specific indexed content",
@@ -66,6 +91,31 @@ TRANSLATIONS: dict[str, dict[str, str]] = {
         # --- Sources ---
         "sources_label": "Sources",
         "sources_unavailable": "Not available.",
+        # --- Upload Content page ---
+        "upload_page_title": "Upload content for the tutor",
+        "upload_page_caption": "Upload PDFs and associate them with a course to index in ChromaDB",
+        "label_target_course": "Target course",
+        "label_select_pdfs": "Select one or more PDFs",
+        "btn_index": "Index in ChromaDB",
+        "warn_no_files": "You must upload at least one PDF file first.",
+        "status_indexing": "Indexing documents...",
+        "status_processing": "Processing:",
+        "status_done": "Indexing complete",
+        "success_indexed": "Successfully indexed {chunks} chunks for course '{course}'.",
+        "subheader_indexed_docs": "Indexed documents",
+        "info_no_docs": "No documents indexed yet for this course.",
+        # --- Settings page ---
+        "settings_page_title": "Tutor settings",
+        "settings_page_caption": "Save your provider credentials and Ollama URL",
+        "label_openai_key": "OpenAI API key",
+        "label_anthropic_key": "Anthropic API key",
+        "label_google_key": "Google API key",
+        "btn_save_settings": "Save settings",
+        "success_settings_saved": "Settings saved for the current session.",
+        "info_secrets_hint": (
+            "To persist keys beyond the session, use `.streamlit/secrets.toml` "
+            "based on the `secrets.toml.example` template."
+        ),
     },
 }
 
@@ -76,5 +126,5 @@ LANGUAGE_OPTIONS: dict[str, str] = {
 
 
 def get_translations(lang: str) -> dict[str, str]:
-    """Retorna el diccionario de traducciones para el idioma dado."""
+    """Returns the translation dictionary for the given language."""
     return TRANSLATIONS.get(lang, TRANSLATIONS["es"])
