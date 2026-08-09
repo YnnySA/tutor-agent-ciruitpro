@@ -9,21 +9,28 @@ from streamlit.errors import StreamlitSecretNotFoundError
 
 try:
     from anthropic import APIError as AnthropicAPIError
-except ImportError:  # pragma: no cover - dependiente del entorno
+except ImportError:  # pragma: no cover
     AnthropicAPIError = RuntimeError
 
 try:
     from google.api_core.exceptions import GoogleAPIError
-except ImportError:  # pragma: no cover - dependiente del entorno
+except ImportError:  # pragma: no cover
     GoogleAPIError = RuntimeError
 
 from core.llm_factory import PROVIDER_MODELS, get_llm
 from core.rag_pipeline import ask_tutor, create_rag_chain
+from frontend.i18n import LANGUAGE_OPTIONS, get_translations
 
 ASIGNATURAS = {
     "Circuitos eléctricos": "circuitos",
     "Electrónica": "electronica",
     "Máquinas eléctricas": "maquinas_electricas",
+}
+
+ASIGNATURAS_EN = {
+    "Electric Circuits": "circuitos",
+    "Electronics": "electronica",
+    "Electric Machines": "maquinas_electricas",
 }
 
 CONFIG_KEYS = {
@@ -36,7 +43,6 @@ CONFIG_KEYS = {
 def _inicializar_estado() -> None:
     """Inicializa el estado global de la app."""
     def _secret(nombre: str, default: str) -> str:
-        """Lee una clave de `st.secrets` sin fallar si no existe archivo de secretos."""
         try:
             return st.secrets.get(nombre, default)
         except StreamlitSecretNotFoundError:
@@ -51,23 +57,22 @@ def _inicializar_estado() -> None:
             "ollama_url": _secret("OLLAMA_URL", "http://localhost:11434"),
         },
     )
-    st.session_state.setdefault(
-        "tutor_messages",
-        [
-            {
-                "role": "assistant",
-                "content": (
-                    "Hola, soy tu tutor de Ingeniería Eléctrica. "
-                    "Haz una pregunta sobre la asignatura seleccionada."
-                ),
-            }
-        ],
-    )
     st.session_state.setdefault("tutor_chain", None)
     st.session_state.setdefault("tutor_chain_config", None)
+    st.session_state.setdefault("lang", "es")
 
 
-def _mensaje_error(exc: Exception, provider: str) -> str:
+def _init_messages(t: dict) -> None:
+    """Inicializa o reinicia los mensajes si cambia el idioma."""
+    welcome = t["welcome_message"]
+    messages = st.session_state.get("tutor_messages", [])
+    if not messages or messages[0]["content"] != welcome:
+        st.session_state["tutor_messages"] = [
+            {"role": "assistant", "content": welcome}
+        ]
+
+
+def _mensaje_error(exc: Exception, provider: str, t: dict) -> str:
     """Convierte excepciones técnicas en mensajes claros para la interfaz."""
     raw = str(exc)
     text = raw.lower()
@@ -75,46 +80,60 @@ def _mensaje_error(exc: Exception, provider: str) -> str:
     if "no hay documentos indexados" in text:
         return raw
     if any(token in text for token in ("401", "unauthorized", "authentication", "api key")):
-        return "La API key es inválida o no tiene permisos para el modelo seleccionado."
+        return t["error_invalid_key"]
     if provider == "Ollama" and any(token in text for token in ("connection", "refused", "connect")):
-        return (
-            "No fue posible conectarse con Ollama. "
-            "Verifica que esté activo y que la URL sea correcta."
-        )
-    return f"Ocurrió un error al generar la respuesta: {raw}"
+        return t["error_ollama_connection"]
+    return t["error_generic"].format(raw=raw)
 
 
 _inicializar_estado()
 
-st.set_page_config(page_title="Tutor RAG de Ingeniería Eléctrica", page_icon=":material/school:")
-st.title("Tutor RAG de Ingeniería Eléctrica")
-st.caption("Responde con base en el contenido indexado por asignatura")
+# --- Language selector (top of sidebar, affects everything) ---
+with st.sidebar:
+    lang_label = st.selectbox(
+        "🌐 Language / Idioma",
+        list(LANGUAGE_OPTIONS.keys()),
+        index=0 if st.session_state["lang"] == "es" else 1,
+        key="lang_selector",
+    )
+    st.session_state["lang"] = LANGUAGE_OPTIONS[lang_label]
+
+t = get_translations(st.session_state["lang"])
+_init_messages(t)
+
+# --- Page config & header ---
+st.set_page_config(page_title=t["page_title"], page_icon=":material/school:")
+st.title(t["app_title"])
+st.caption(t["app_caption"])
+
+# --- Sidebar config ---
+course_map = ASIGNATURAS_EN if st.session_state["lang"] == "en" else ASIGNATURAS
 
 with st.sidebar:
-    st.subheader("Configuración del tutor")
-    asignatura_label = st.selectbox("Asignatura", list(ASIGNATURAS.keys()))
-    asignatura = ASIGNATURAS[asignatura_label]
+    st.subheader(t["sidebar_title"])
+    asignatura_label = st.selectbox(t["label_course"], list(course_map.keys()))
+    asignatura = course_map[asignatura_label]
 
-    provider = st.selectbox("Proveedor LLM", list(PROVIDER_MODELS.keys()))
-    model = st.selectbox("Modelo", PROVIDER_MODELS[provider])
+    provider = st.selectbox(t["label_provider"], list(PROVIDER_MODELS.keys()))
+    model = st.selectbox(t["label_model"], PROVIDER_MODELS[provider])
 
     config = st.session_state["tutor_config"]
     api_key = ""
     ollama_url = config.get("ollama_url", "http://localhost:11434")
 
     if provider == "Ollama":
-        st.info("Para Ollama no se requiere API key.")
+        st.info(t["ollama_info"])
         ollama_url = st.text_input(
-            "URL de Ollama",
+            t["label_ollama_url"],
             value=ollama_url,
             key="tutor_ollama_url_runtime",
-            help="Ejemplo: http://localhost:11434",
+            help=t["ollama_help"],
         )
         config["ollama_url"] = ollama_url
     else:
         key_name = CONFIG_KEYS[provider]
         api_key = st.text_input(
-            f"API key de {provider}",
+            f"{t['label_api_key']} {provider}",
             type="password",
             value=config.get(key_name, ""),
             key=f"tutor_api_key_{provider.lower()}",
@@ -122,12 +141,13 @@ with st.sidebar:
         if api_key:
             config[key_name] = api_key
 
+# --- Chat messages ---
 for msg in st.session_state["tutor_messages"]:
     st.chat_message(msg["role"]).write(msg["content"])
 
-if prompt := st.chat_input("Escribe tu pregunta del material cargado"):
+if prompt := st.chat_input(t["chat_placeholder"]):
     if provider != "Ollama" and not api_key:
-        st.info(f"Agrega tu API key de {provider} para continuar.")
+        st.info(t["error_no_api_key"].format(provider=provider))
         st.stop()
 
     st.session_state["tutor_messages"].append({"role": "user", "content": prompt})
@@ -136,7 +156,10 @@ if prompt := st.chat_input("Escribe tu pregunta del material cargado"):
     try:
         llm = get_llm(provider=provider, model=model, api_key=api_key, ollama_url=ollama_url)
         chain_config = (asignatura, provider, model, api_key, ollama_url)
-        if st.session_state["tutor_chain"] is None or st.session_state["tutor_chain_config"] != chain_config:
+        if (
+            st.session_state["tutor_chain"] is None
+            or st.session_state["tutor_chain_config"] != chain_config
+        ):
             st.session_state["tutor_chain"] = create_rag_chain(
                 asignatura=asignatura,
                 llm=llm,
@@ -145,10 +168,12 @@ if prompt := st.chat_input("Escribe tu pregunta del material cargado"):
             st.session_state["tutor_chain_config"] = chain_config
 
         answer, sources = ask_tutor(st.session_state["tutor_chain"], prompt)
+        src_label = t["sources_label"]
+        src_none = t["sources_unavailable"]
         if sources:
-            answer = f"{answer}\n\n**Fuentes:** {', '.join(sources)}"
+            answer = f"{answer}\n\n**{src_label}:** {', '.join(sources)}"
         else:
-            answer = f"{answer}\n\n**Fuentes:** No disponibles."
+            answer = f"{answer}\n\n**{src_label}:** {src_none}"
 
     except (
         ValueError,
@@ -160,7 +185,7 @@ if prompt := st.chat_input("Escribe tu pregunta del material cargado"):
         GoogleAPIError,
         HTTPError,
     ) as exc:
-        answer = _mensaje_error(exc, provider)
+        answer = _mensaje_error(exc, provider, t)
 
     st.session_state["tutor_messages"].append({"role": "assistant", "content": answer})
     st.chat_message("assistant").write(answer)
