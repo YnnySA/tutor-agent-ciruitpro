@@ -1,0 +1,46 @@
+refactor(fase1): desanidar llm-examples/ a raíz del repo
+
+# Conflicts:
+#	.gitignore
+#	Chatbot.py
+#	requirements.txt
+
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# interactive rebase in progress; onto e41cf0a
+# Last command done (1 command done):
+#    pick d5bcfae # refactor(fase1): desanidar llm-examples/ a raíz del repo
+# No commands remaining.
+# You are currently rebasing branch 'main' on 'e41cf0a'.
+#
+# Changes to be committed:
+#	renamed:    llm-examples/.devcontainer/devcontainer.json -> .devcontainer/devcontainer.json
+#	renamed:    llm-examples/.github/copilot-instructions.md -> .github/copilot-instructions.md
+#	renamed:    llm-examples/.github/workflows/app-testing.yml -> .github/workflows/app-testing.yml
+#	modified:   .gitignore
+#	renamed:    llm-examples/.pre-commit-config.yaml -> .pre-commit-config.yaml
+#	renamed:    llm-examples/.ruff.toml -> .ruff.toml
+#	renamed:    llm-examples/.streamlit/secrets.toml.example -> .streamlit/secrets.toml.example
+#	renamed:    llm-examples/.vscode/mcp.json -> .vscode/mcp.json
+#	modified:   Chatbot.py
+#	renamed:    llm-examples/LICENSE -> LICENSE
+#	renamed:    llm-examples/README.md -> README.md
+#	renamed:    llm-examples/app_test.py -> app_test.py
+#	renamed:    llm-examples/core/__init__.py -> core/__init__.py
+#	renamed:    llm-examples/core/llm_factory.py -> core/llm_factory.py
+#	renamed:    llm-examples/core/rag_pipeline.py -> core/rag_pipeline.py
+#	renamed:    llm-examples/core/vector_store.py -> core/vector_store.py
+#	deleted:    llm-examples/.gitignore
+#	deleted:    llm-examples/Chatbot.py
+#	deleted:    llm-examples/content/asignaturas/circuitos/.gitkeep
+#	deleted:    llm-examples/content/asignaturas/electronica/.gitkeep
+#	deleted:    llm-examples/content/asignaturas/maquinas_electricas/.gitkeep
+#	deleted:    llm-examples/requirements.txt
+#	renamed:    llm-examples/pages/1_Cargar_Contenido.py -> pages/1_Cargar_Contenido.py
+#	renamed:    llm-examples/pages/2_Configuracion.py -> pages/2_Configuracion.py
+#	new file:   palette.txt
+#	renamed:    llm-examples/requirements-dev.txt -> requirements-dev.txt
+#	modified:   requirements.txt
+
+
